@@ -30,6 +30,7 @@
 		0021 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1021 /* Constants.swift */; };
 		0022 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2001 /* SwiftSoup */; };
 		0023 /* MangaDexSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1023 /* MangaDexSource.swift */; };
+		0024 /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024 /* DTOs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +58,7 @@
 		1021 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1023 /* MangaDexSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaDexSource.swift; sourceTree = "<group>"; };
+		1024 /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 				1004 /* Manga.swift */,
 				1005 /* Chapter.swift */,
 				1006 /* Page.swift */,
+				1024 /* DTOs.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -261,6 +264,7 @@
 				0020 /* Extensions.swift in Sources */,
 				0021 /* Constants.swift in Sources */,
 				0023 /* MangaDexSource.swift in Sources */,
+				0024 /* DTOs.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,7 +2,7 @@ import Foundation
 
 /// MangaDex API source implementation
 /// Uses the public MangaDex API for manga data
-final class MangaDexSource: MangaSource {
+final class MangaDexSource {
     let id = "mangadex"
     let name = "MangaDex"
     let baseURL = "https://api.mangadex.org"
@@ -19,7 +19,7 @@ final class MangaDexSource: MangaSource {
         self.session = URLSession(configuration: config)
     }
     
-    func fetchPopular(page: Int = 1) async throws -> [Manga] {
+    func fetchPopular(page: Int = 1) async throws -> [MangaDTO] {
         let offset = (page - 1) * 20
         let url = URL(string: "\(baseURL)/manga?limit=20&offset=\(offset)&order[followedCount]=desc&includes[]=cover_art&contentRating[]=safe&contentRating[]=suggestive")!
         
@@ -27,7 +27,7 @@ final class MangaDexSource: MangaSource {
         return try parseMangaList(data: data)
     }
     
-    func search(query: String, page: Int = 1) async throws -> [Manga] {
+    func search(query: String, page: Int = 1) async throws -> [MangaDTO] {
         let offset = (page - 1) * 20
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let url = URL(string: "\(baseURL)/manga?limit=20&offset=\(offset)&title=\(encodedQuery)&includes[]=cover_art&contentRating[]=safe&contentRating[]=suggestive")!
@@ -36,9 +36,8 @@ final class MangaDexSource: MangaSource {
         return try parseMangaList(data: data)
     }
     
-    func fetchChapters(for manga: Manga) async throws -> [Chapter] {
-        let mangaId = manga.id
-        var allChapters: [Chapter] = []
+    func fetchChapters(mangaId: String) async throws -> [ChapterDTO] {
+        var allChapters: [ChapterDTO] = []
         var offset = 0
         let limit = 100
         
@@ -59,20 +58,18 @@ final class MangaDexSource: MangaSource {
         return allChapters
     }
     
-    func fetchPages(for chapter: Chapter) async throws -> [Page] {
-        let chapterId = chapter.id
+    func fetchPages(chapterId: String) async throws -> [Page] {
         let url = URL(string: "\(baseURL)/at-home/server/\(chapterId)")!
         
         let data = try await fetchData(from: url)
         return try parsePages(data: data, chapterID: chapterId)
     }
     
-    func fetchMangaDetails(for manga: Manga) async throws -> Manga {
-        let mangaId = manga.id
+    func fetchMangaDetails(mangaId: String) async throws -> MangaDTO {
         let url = URL(string: "\(baseURL)/manga/\(mangaId)?includes[]=author&includes[]=cover_art")!
         
         let data = try await fetchData(from: url)
-        return try parseMangaDetails(data: data, existingManga: manga)
+        return try parseMangaDetails(data: data)
     }
     
     // MARK: - Private Methods
@@ -92,13 +89,13 @@ final class MangaDexSource: MangaSource {
         }
     }
     
-    private func parseMangaList(data: Data) throws -> [Manga] {
+    private func parseMangaList(data: Data) throws -> [MangaDTO] {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let dataArray = json["data"] as? [[String: Any]] else {
             throw SourceError.parsingError("Invalid manga list response")
         }
         
-        return dataArray.compactMap { item -> Manga? in
+        return dataArray.compactMap { item -> MangaDTO? in
             guard let id = item["id"] as? String,
                   let attributes = item["attributes"] as? [String: Any],
                   let titleObj = attributes["title"] as? [String: String] else {
@@ -124,7 +121,7 @@ final class MangaDexSource: MangaSource {
             let descriptionObj = attributes["description"] as? [String: String]
             let synopsis = descriptionObj?["en"] ?? ""
             
-            return Manga(
+            return MangaDTO(
                 id: id,
                 title: title,
                 coverURL: coverURL,
@@ -134,13 +131,13 @@ final class MangaDexSource: MangaSource {
         }
     }
     
-    private func parseChapterList(data: Data) throws -> [Chapter] {
+    private func parseChapterList(data: Data) throws -> [ChapterDTO] {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let dataArray = json["data"] as? [[String: Any]] else {
             throw SourceError.parsingError("Invalid chapter list response")
         }
         
-        return dataArray.compactMap { item -> Chapter? in
+        return dataArray.compactMap { item -> ChapterDTO? in
             guard let id = item["id"] as? String,
                   let attributes = item["attributes"] as? [String: Any] else {
                 return nil
@@ -150,7 +147,7 @@ final class MangaDexSource: MangaSource {
             let chapterNumber = Double(chapterNum) ?? 0
             let title = attributes["title"] as? String ?? "Chapter \(chapterNum)"
             
-            return Chapter(
+            return ChapterDTO(
                 id: id,
                 number: chapterNumber,
                 title: title.isEmpty ? "Chapter \(chapterNum)" : title,
@@ -174,34 +171,48 @@ final class MangaDexSource: MangaSource {
         }
     }
     
-    private func parseMangaDetails(data: Data, existingManga: Manga) throws -> Manga {
+    private func parseMangaDetails(data: Data) throws -> MangaDTO {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let dataObj = json["data"] as? [String: Any],
-              let attributes = dataObj["attributes"] as? [String: Any] else {
+              let id = dataObj["id"] as? String,
+              let attributes = dataObj["attributes"] as? [String: Any],
+              let titleObj = attributes["title"] as? [String: String] else {
             throw SourceError.parsingError("Invalid manga details response")
         }
         
+        let title = titleObj["en"] ?? titleObj["ja"] ?? titleObj.values.first ?? "Unknown"
+        
         // Get author from relationships
         var author = ""
+        var coverURL = ""
         if let relationships = dataObj["relationships"] as? [[String: Any]] {
             for rel in relationships {
                 if rel["type"] as? String == "author",
                    let relAttributes = rel["attributes"] as? [String: Any],
                    let name = relAttributes["name"] as? String {
                     author = name
-                    break
+                }
+                if rel["type"] as? String == "cover_art",
+                   let relAttributes = rel["attributes"] as? [String: Any],
+                   let fileName = relAttributes["fileName"] as? String {
+                    coverURL = "\(coverBaseURL)/\(id)/\(fileName).256.jpg"
                 }
             }
         }
         
         let status = (attributes["status"] as? String)?.capitalized ?? "Ongoing"
         let descriptionObj = attributes["description"] as? [String: String]
-        let synopsis = descriptionObj?["en"] ?? existingManga.synopsis
+        let synopsis = descriptionObj?["en"] ?? ""
         
-        existingManga.author = author
-        existingManga.status = status
-        existingManga.synopsis = synopsis
-        
-        return existingManga
+        return MangaDTO(
+            id: id,
+            title: title,
+            coverURL: coverURL,
+            sourceID: self.id,
+            synopsis: synopsis,
+            author: author,
+            status: status
+        )
     }
 }
+

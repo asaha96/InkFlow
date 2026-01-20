@@ -1,8 +1,12 @@
 import SwiftUI
 import SwiftData
 
+// This file is kept for library functionality (persisted manga)
+// Discovery uses DTO-based views in DiscoveryView.swift
+
 struct MangaDetailView: View {
-    @Bindable var manga: Manga
+    let manga: Manga
+    
     @Environment(\.modelContext) private var modelContext
     @Environment(ImageLoader.self) private var imageLoader
     @Environment(HapticManager.self) private var hapticManager
@@ -13,20 +17,15 @@ struct MangaDetailView: View {
     @State private var errorMessage: String?
     @State private var selectedChapter: Chapter?
     
-    private let source = MangaDexSource()
-    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Header Section
                 headerSection
                 
-                // Synopsis
                 if !manga.synopsis.isEmpty {
                     synopsisSection
                 }
                 
-                // Chapters
                 chaptersSection
             }
             .padding()
@@ -34,7 +33,7 @@ struct MangaDetailView: View {
         .navigationTitle(manga.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     toggleLibrary()
                 } label: {
@@ -57,7 +56,6 @@ struct MangaDetailView: View {
     
     private var headerSection: some View {
         HStack(alignment: .top, spacing: 16) {
-            // Cover
             ZStack {
                 if let image = coverImage {
                     Image(uiImage: image)
@@ -72,7 +70,6 @@ struct MangaDetailView: View {
             .frame(width: 120, height: 170)
             .clipShape(RoundedRectangle(cornerRadius: 8))
             
-            // Info
             VStack(alignment: .leading, spacing: 8) {
                 Text(manga.title)
                     .font(.headline)
@@ -94,10 +91,9 @@ struct MangaDetailView: View {
                 
                 Spacer()
                 
-                // Continue Reading Button
-                if let lastChapter = chapters.first(where: { !$0.isRead }) ?? chapters.first {
+                if let firstChapter = chapters.last {
                     Button {
-                        selectedChapter = lastChapter
+                        selectedChapter = firstChapter
                     } label: {
                         Label("Start Reading", systemImage: "play.fill")
                             .font(.subheadline.bold())
@@ -151,29 +147,10 @@ struct MangaDetailView: View {
     }
     
     private func loadDetails() async {
-        // Load cover
         coverImage = await imageLoader.loadImage(from: manga.coverURL)
         
-        // Load details
-        do {
-            _ = try await source.fetchMangaDetails(for: manga)
-        } catch {
-            // Not critical, continue
-        }
-        
-        // Load chapters
-        isLoadingChapters = true
-        do {
-            chapters = try await source.fetchChapters(for: manga)
-            
-            // Associate with manga
-            for chapter in chapters {
-                chapter.manga = manga
-            }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoadingChapters = false
+        // Load chapters from SwiftData relationship
+        chapters = manga.chapters
     }
     
     private func toggleLibrary() {
