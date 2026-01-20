@@ -31,6 +31,10 @@
 		0022 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2001 /* SwiftSoup */; };
 		0023 /* MangaDexSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1023 /* MangaDexSource.swift */; };
 		0024 /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024 /* DTOs.swift */; };
+		0025 /* MangaCardDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1025 /* MangaCardDTO.swift */; };
+		0026 /* ChapterRowDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026 /* ChapterRowDTO.swift */; };
+		0027 /* MangaDetailViewDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1027 /* MangaDetailViewDTO.swift */; };
+		0028 /* ReaderViewDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028 /* ReaderViewDTO.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +63,10 @@
 		1022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1023 /* MangaDexSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaDexSource.swift; sourceTree = "<group>"; };
 		1024 /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
+		1025 /* MangaCardDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaCardDTO.swift; sourceTree = "<group>"; };
+		1026 /* ChapterRowDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterRowDTO.swift; sourceTree = "<group>"; };
+		1027 /* MangaDetailViewDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaDetailViewDTO.swift; sourceTree = "<group>"; };
+		1028 /* ReaderViewDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderViewDTO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +153,7 @@
 				1015 /* ReaderView.swift */,
 				1016 /* MangaDetailView.swift */,
 				4007 /* Components */,
+				4009 /* DTO */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -157,6 +166,17 @@
 				1019 /* PageImageView.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		4009 /* DTO */ = {
+			isa = PBXGroup;
+			children = (
+				1025 /* MangaCardDTO.swift */,
+				1026 /* ChapterRowDTO.swift */,
+				1027 /* MangaDetailViewDTO.swift */,
+				1028 /* ReaderViewDTO.swift */,
+			);
+			path = DTO;
 			sourceTree = "<group>";
 		};
 		4008 /* Utilities */ = {
@@ -265,6 +285,10 @@
 				0021 /* Constants.swift in Sources */,
 				0023 /* MangaDexSource.swift in Sources */,
 				0024 /* DTOs.swift in Sources */,
+				0025 /* MangaCardDTO.swift in Sources */,
+				0026 /* ChapterRowDTO.swift in Sources */,
+				0027 /* MangaDetailViewDTO.swift in Sources */,
+				0028 /* ReaderViewDTO.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
