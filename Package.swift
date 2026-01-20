@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "ManhwaReader",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v17), .macOS(.v10_15)],
     dependencies: [
         .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.6.0")
     ],
