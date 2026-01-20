@@ -12,7 +12,7 @@ struct DiscoveryView: View {
     @State private var isSearching = false
     @State private var errorMessage: String?
     
-    private let source = ManganatoSource()
+    private let source = MangaDexSource()
     
     private let columns = [
         GridItem(.flexible(), spacing: 12),

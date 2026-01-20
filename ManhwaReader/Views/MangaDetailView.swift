@@ -13,7 +13,7 @@ struct MangaDetailView: View {
     @State private var errorMessage: String?
     @State private var selectedChapter: Chapter?
     
-    private let source = ManganatoSource()
+    private let source = MangaDexSource()
     
     var body: some View {
         ScrollView {
