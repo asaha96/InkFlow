@@ -3,15 +3,12 @@ import PackageDescription
 
 let package = Package(
     name: "ManhwaReader",
-    platforms: [.iOS(.v17), .macOS(.v14)],
-    products: [
-        .library(name: "ManhwaReader", targets: ["ManhwaReader"])
-    ],
+    platforms: [.iOS(.v17)],
     dependencies: [
         .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.6.0")
     ],
     targets: [
-        .target(
+        .executableTarget(
             name: "ManhwaReader",
             dependencies: ["SwiftSoup"],
             path: "ManhwaReader"
